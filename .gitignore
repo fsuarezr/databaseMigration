@@ -1,1 +1,11 @@
 .env
+Thumbs.db
+.DS_Store
+
+venv/*
+
+__pycache__
+config/__pycache__
+*.csv
+*.log
+*.log.*
