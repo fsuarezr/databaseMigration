@@ -1,14 +1,25 @@
-import os
+import sys
 from datetime import datetime
+
 from dotenv import load_dotenv
+
+from common import validate_queries, validate_tables
 from database import Database
+from common import config
 
 load_dotenv()
 
+import logging
+
 # Configurando Logger
 import logging.handlers as handlers
-import logging
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', datefmt="%d/%m/%Y %I:%M:%S", handlers=[ logging.StreamHandler(), handlers.TimedRotatingFileHandler('audit.log', when='midnight', interval=1) ])
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    datefmt="%d/%m/%Y %I:%M:%S",
+    handlers=[logging.StreamHandler(),handlers.TimedRotatingFileHandler("audit.log", when="midnight", interval=1),],
+)
 logger = logging.getLogger(__name__)
 
 # Configurando parámetros a pasar al ejecutar el programa
@@ -22,17 +33,26 @@ args = parser.parse_args()
 
 
 def runMigration(initDate, endDate, tableOrigin, tableTarget):
-   print(initDate, endDate, tableOrigin, tableTarget)
-   query_select =f'SELECT * FROM {tableOrigin}'
-   getDataOrigin = Database.executeQuery(source='ORIGIN',method='select',query=query_select)
+    if not validate_tables(table_origin=tableOrigin, table_target=tableTarget):
+        sys.exit()
 
-   for element in getDataOrigin:
-      print(element)
-      print(element[4])
-      query_insert = f"INSERT INTO {tableTarget} (first_name, last_name, email, password, is_active) VALUES (%s, %s, %s, %s, %s)"
-      values = (element[1], element[2], element[3], element[4], element[5])
-      asd = Database.executeQuery(method='insert', query=query_insert, source='TARGET', values=values)
-      print(asd)
+    if not validate_queries(table_origin=tableOrigin, table_target=tableTarget):
+        sys.exit()
 
-if __name__ == '__main__':
-   runMigration(args.initDate, args.endDate, args.tableOrigin, args.tableTarget)
+    query_select = config()["tables"][tableOrigin]["queries"]["select"]
+    getDataOrigin = Database.executeQuery(
+        source="ORIGIN", method="select", query=query_select, table=tableOrigin
+    )
+
+    for element in getDataOrigin:
+        query_insert = config()["tables"][tableTarget]["queries"]["insert"]
+        values = (element[1], element[2], element[3], element[4], element[5])
+        insert_result = Database.executeQuery(
+            method="insert", query=query_insert, source="TARGET", values=values, table=tableTarget
+        )
+        logger.info(f'Record saved on {tableTarget}: {insert_result}')
+
+
+if __name__ == "__main__":
+    runMigration(args.initDate, args.endDate, args.tableOrigin, args.tableTarget)
+

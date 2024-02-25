@@ -42,16 +42,18 @@ class Database:
                 logger.info('PostgreSQL connection is closed')
 
    @classmethod
-   def executeQuery(self, method, query, source, values = None):
+   def executeQuery(self, method, query, source, values = None, table = None):
       cursor = self.getConnection(source)
 
       try:
             if method == 'select':
+                logger.info(f'Getting data from {table}')
                 cursor.execute(query)
                 data = cursor.fetchall()
                 return data
              
             elif method == 'insert':
+                logger.info(f'Inserting record into {table}')
                 cursor.execute(query,values)
                 cursor.connection.commit()
                 return True
