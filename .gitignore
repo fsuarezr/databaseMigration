@@ -2,7 +2,7 @@
 Thumbs.db
 .DS_Store
 
-queries.yml
+queries.yaml
 
 venv/*
 
