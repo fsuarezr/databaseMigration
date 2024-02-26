@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 __config = None
 
 
+# Loading yaml file into config()
 def config():
     global __config
     if not __config:
@@ -26,9 +27,10 @@ def config():
 
 
 def validate_tables(table_origin, table_target):
+    logger.info(f'Validating if tables: {table_origin} and {table_target} exist in queries.yaml')
     # Check if the tables exist in the configuration
     tables_config = config()["tables"]
-    
+
     if table_origin not in tables_config:
         logger.error(f"Error: Table '{table_origin}' does not exist in queries.yaml")
         return False
@@ -36,6 +38,9 @@ def validate_tables(table_origin, table_target):
     if table_target not in tables_config:
         logger.error(f"Error: Table '{table_target}' does not exist in queries.yaml")
         return False
+    
+    logger.info('Successful validation')
+    return True
 
 
 def validate_queries(table_origin, table_target):
