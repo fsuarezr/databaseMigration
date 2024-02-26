@@ -16,13 +16,13 @@ Clone the following repository to your local folder.
 * The queries.yaml file defines SQL queries for data migration. The structure of the file is as follows:
    ```
    tables:
-   <table_name>:
-      queries:
-         select:
-   <table_name>:
-      columns:
-      queries:
-         insert:
+      <table_name>:
+         queries:
+            select:
+      <table_name>:
+         columns:
+         queries:
+            insert:
    ```
 
    #### Considerations:
