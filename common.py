@@ -26,40 +26,49 @@ def config():
 
 
 def validate_tables(table_origin, table_target):
-    if table_origin not in config()["tables"]:
-        logger.error(f"Error: Table '{table_origin}' not found in queries.yaml")
+    # Check if the tables exist in the configuration
+    tables_config = config()["tables"]
+    
+    if table_origin not in tables_config:
+        logger.error(f"Error: Table '{table_origin}' does not exist in queries.yaml")
         return False
-
-    if table_target not in config()["tables"]:
-        logger.error(f"Error: Table '{table_target}' not found in queries.yaml")
+    
+    if table_target not in tables_config:
+        logger.error(f"Error: Table '{table_target}' does not exist in queries.yaml")
         return False
-
-    return True
 
 
 def validate_queries(table_origin, table_target):
-    if "queries" not in config()["tables"][table_origin]:
-        logger.error(
-            f"Error: Missing 'queries' section for table '{table_origin}' in queries.yaml"
-        )
+    tables_config = config()["tables"]
+
+    # Check if 'queries' exist for the tables
+    if "queries" not in tables_config[table_origin]:
+        logger.error(f"Error: Missing 'queries' section for table '{table_origin}' in queries.yaml")
+        return False
+    
+    if "queries" not in tables_config[table_target]:
+        logger.error(f"Error: Missing 'queries' section for table '{table_target}' in queries.yaml")
         return False
 
-    if "queries" not in config()["tables"][table_target]:
-        logger.error(
-            f"Error: Missing 'queries' section for table '{table_target}' in queries.yaml"
-        )
+    # Verify 'select' for table_origin and 'insert' for table_target
+    origin_queries = tables_config[table_origin]["queries"]
+    target_queries = tables_config[table_target]["queries"]
+    
+    if origin_queries is None:
+        logger.error(f"Error: Missing 'queries' section for table '{table_origin}' in queries.yaml")
+        return False
+    if target_queries is None:
+        logger.error(f"Error: Missing 'queries' section for table '{table_target}' in queries.yaml")
         return False
 
-    if "select" not in config()["tables"][table_origin]["queries"]:
-        logger.error(
-            f"Error: Missing 'select' query for table '{table_origin}' in queries.yaml"
-        )
+    # Check if 'select' query exists and is not empty
+    if "select" not in origin_queries or not origin_queries["select"]:
+        logger.error(f"Error: Missing or empty 'select' query for table '{table_origin}' in queries.yaml")
         return False
 
-    if "insert" not in config()["tables"][table_target]["queries"]:
-        logger.error(
-            f"Error: Missing 'insert' query for table '{table_target}' in queries.yaml"
-        )
+    # Check if 'insert' query exists and is not empty
+    if "insert" not in target_queries or not target_queries["insert"]:
+        logger.error(f"Error: Missing or empty 'insert' query for table '{table_target}' in queries.yaml")
         return False
 
     return True
