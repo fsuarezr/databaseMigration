@@ -53,6 +53,8 @@ def runMigration(initDate, endDate, tableOrigin, tableTarget):
     # Get column names from the target table configuration
     target_columns = config()["tables"][tableTarget]["columns"]
 
+    records_inserted = 0
+
     for element in getDataOrigin:
         logger.info(' ')
         logger.info(f'Saving record {element} into: {tableTarget}')
@@ -63,7 +65,9 @@ def runMigration(initDate, endDate, tableOrigin, tableTarget):
             method="insert", query=query_insert, source="TARGET", values=values, table=tableTarget
         )
         logger.info(f'Record saved on {tableTarget}: {insert_result}')
+        records_inserted +=1
 
+    logger.info(f'{records_inserted} records were inserted on {tableTarget}')
 
 if __name__ == "__main__":
     runMigration(args.initDate, args.endDate, args.tableOrigin, args.tableTarget)

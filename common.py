@@ -54,16 +54,26 @@ def validate_queries(table_origin, table_target):
     if "queries" not in tables_config[table_target]:
         logger.error(f"Error: Missing 'queries' section for table '{table_target}' in queries.yaml")
         return False
+    
+    if "columns" not in tables_config[table_target]:
+        logger.error(f"Error: Missing 'columns' section for table '{table_target}' in queries.yaml")
+        return False
 
-    # Verify 'select' for table_origin and 'insert' for table_target
+    # Verify 'select' for table_origin, 'insert' for table_target and 'columns' for table_target
     origin_queries = tables_config[table_origin]["queries"]
     target_queries = tables_config[table_target]["queries"]
+    target_columns = tables_config[table_target]["columns"]
     
     if origin_queries is None:
         logger.error(f"Error: Missing 'queries' section for table '{table_origin}' in queries.yaml")
         return False
+    
     if target_queries is None:
         logger.error(f"Error: Missing 'queries' section for table '{table_target}' in queries.yaml")
+        return False
+    
+    if target_columns is None or not target_columns:
+        logger.error(f"Error: Missing or empty 'columns' for table '{table_target}' in queries.yaml")
         return False
 
     # Check if 'select' query exists and is not empty
