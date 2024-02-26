@@ -11,7 +11,7 @@ load_dotenv()
 
 import logging
 
-# Configurando Logger
+# Configuring Logger
 import logging.handlers as handlers
 
 logging.basicConfig(
@@ -22,13 +22,13 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Configurando parámetros a pasar al ejecutar el programa
+# Configuring parameters to pass when running the program
 import argparse
 parser = argparse.ArgumentParser(description = 'Database migration for tables in PostgreSQL')
 parser.add_argument('-id','--initDate', type=lambda d: datetime.strptime(d, '%Y-%m-%d'), help='Init date to fetch records from database -format YYYY-MM-DD', required=True, metavar='')
 parser.add_argument('-ed','--endDate', type=lambda d: datetime.strptime(d, '%Y-%m-%d'), help='End date to fetch records from database -format YYYY-MM-DD', required=True, metavar='')
-parser.add_argument('-to','--tableOrigin', type=str, help='Table to migrate', required=True, metavar='')
-parser.add_argument('-tt','--tableTarget', type=str, help='Table to migrate', required=True, metavar='')
+parser.add_argument('-to','--tableOrigin', type=str, help='Table to extraxt data', required=True, metavar='')
+parser.add_argument('-tt','--tableTarget', type=str, help='Table to migrate data', required=True, metavar='')
 args = parser.parse_args()
 
 
@@ -44,9 +44,21 @@ def runMigration(initDate, endDate, tableOrigin, tableTarget):
         source="ORIGIN", method="select", query=query_select, table=tableOrigin
     )
 
+    logger.info(f'Records found on {tableOrigin}: {len(getDataOrigin)}')
+
+    if len(getDataOrigin) == 0:
+        logger.info(f'No records found on {tableOrigin}')
+        sys.exit()
+
+    # Get column names from the target table configuration
+    target_columns = config()["tables"][tableTarget]["columns"]
+
     for element in getDataOrigin:
+        logger.info(' ')
+        logger.info(f'Saving record {element} into: {tableTarget}')
         query_insert = config()["tables"][tableTarget]["queries"]["insert"]
-        values = (element[1], element[2], element[3], element[4], element[5])
+        # Extract values based on column names, handling potential mismatches
+        values = [element[target_columns.index(col)] if col in target_columns else None for col in target_columns]
         insert_result = Database.executeQuery(
             method="insert", query=query_insert, source="TARGET", values=values, table=tableTarget
         )
