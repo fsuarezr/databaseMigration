@@ -10,7 +10,7 @@ Clone the following repository to your local folder.
    ```
    1) Have Python 3.8 or higher installed.
    2) Have VirtualEnviroment installed.
-   3) Create a .env file and place it in the project root (refer to .envExample).
+   3) Create a .env file and place it in the project root (refer to .env.template).
    4) Create a queries.yaml file and place it in the project root. *
 ```
 * The queries.yaml file defines SQL queries for data migration. The structure of the file is as follows:
