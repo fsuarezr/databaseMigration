@@ -39,7 +39,7 @@ pip install -r requirements.txt
 ```
 
 ***
-### Ejecución 🧑‍💻
+### Running the project: 🧑‍💻
 To execute the migration, you should navigate to the command line and pass the following parameters to the execution statement in the following order:
 
    > -id --> (initDate) Represents the Start Date to retrieve records from the Source Database (Format YYYY-MM-DD).
