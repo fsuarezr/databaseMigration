@@ -10,7 +10,7 @@ Clone the following repository to your local folder.
    ```
    1) Have Python 3.8 or higher installed.
    2) Have VirtualEnviroment installed.
-   3) Create a .env file and place it in the project root (refer to .envExample).
+   3) Create a .env file and place it in the project root (refer to .env.template).
    4) Create a queries.yaml file and place it in the project root. *
 ```
 * The queries.yaml file defines SQL queries for data migration. The structure of the file is as follows:
@@ -20,7 +20,6 @@ Clone the following repository to your local folder.
          queries:
             select:
       <table_name>:
-         columns:
          queries:
             insert:
    ```
@@ -28,7 +27,7 @@ Clone the following repository to your local folder.
    #### Considerations:
    * Source Tables: Source tables must have a select section within queries that defines the SQL query to extract data.
    * Target Tables: Target tables must have an insert section within queries that defines the SQL query to insert data.
-   * Columns: The columns section defines the columns to be inserted into the target table. The order of the columns must match the order of values in the insert query as they are specified using placeholders %s.
+   > **IMPORTANT:** Ensure column names in your select query match the insert statement. If they don't, use aliases with "AS" in your select query to align them.
 
 ***
 ### Installation 🔧
